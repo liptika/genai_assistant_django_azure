@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center" style="min-height: 40vh;">
+  <div class="col-md-6">
+    <div class="card shadow">
+      <div class="card-header bg-primary text-white text-center">
+        <h4 class="mb-0">Upload Content</h4>
+      </div>
+      <div class="card-body text-center">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="mb-3 text-start">
+            {{ form.as_p }}
+          </div>
+          <button type="submit" class="btn btn-success">Upload</button>
+          <a href="{% url 'home' %}" class="btn btn-secondary ml-2">Back to Home</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
