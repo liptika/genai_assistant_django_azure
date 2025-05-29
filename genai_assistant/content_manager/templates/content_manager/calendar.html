@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Home - GenAI Assistant{% endblock %}
+
+{% block content %}
+<h1 class="mb-4 text-center">Welcome to the GenAI Assistant</h1>
+
+<ul class="list-group text-center mb-5">
+    <li class="list-group-item"><a href="/upload/">Upload New Content</a></li>
+    <li class="list-group-item"><a href="/content_list/">View Uploaded Content</a></li>
+    <li class="list-group-item"><a href="/chatbot/">Chatbot</a></li>
+    <li class="list-group-item"><a href="/api/uploads/">Go to Uploads API</a></li>
+</ul>
+
+<!-- Calendar -->
+<div id="calendar" style="max-width: 900px; margin: 50px auto;"></div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var calendarEl = document.getElementById('calendar');
+    if (calendarEl) {
+      var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        events: '/calendar_events/'
+      });
+      calendar.render();
+    }
+  });
+</script>
+{% endblock %}

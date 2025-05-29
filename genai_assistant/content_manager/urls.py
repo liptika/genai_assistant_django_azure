@@ -6,4 +6,8 @@ urlpatterns = [
     path('upload/', views.upload_content, name='upload'),
     path('content_list/', views.content_list_page, name='content_list'),
     path('chatbot/', views.chatbot_page, name='chatbot'),
+    path('calendar/events/', views.calendar_events, name='calendar_events'),
+    path('calendar-test/', views.calendar_test_view, name='calendar_test'),
+    path('chatbot_api/', views.chatbot_api, name='chatbot_api'),
+    path('content/delete/<int:content_id>/', views.delete_content, name='delete_content'),
 ]
