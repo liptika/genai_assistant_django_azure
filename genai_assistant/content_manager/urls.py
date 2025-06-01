@@ -10,4 +10,5 @@ urlpatterns = [
     path('calendar-test/', views.calendar_test_view, name='calendar_test'),
     path('chatbot_api/', views.chatbot_api, name='chatbot_api'),
     path('content/delete/<int:content_id>/', views.delete_content, name='delete_content'),
+    path('saved_chats/', views.saved_chats, name='saved_chats'),
 ]

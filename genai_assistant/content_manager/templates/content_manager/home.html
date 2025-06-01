@@ -1,33 +1,90 @@
 {% extends 'base.html' %}
 {% block title %}Home - GenAI Assistant{% endblock %}
 {% block content %}
-<div class="row mt-5 text-left">
-  <h1 class="mb-4">Welcome to the GenAI Assistant</h1>
-
-  <!-- Content Links -->
-  <div class="col-md-8">
-    <ul class="list-group">
-      <li class="list-group-item"><a href="/upload/">📤 Upload New Content</a></li>
-      <li class="list-group-item"><a href="/content_list/">📚 View Uploaded Content</a></li>
-      <li class="list-group-item"><a href="/api/uploads/">🔗 View Uploads API</a></li>
-    </ul>
+<div class="row mt-4">
+  <div class="col-12 mb-4">
+    <div class="bg-white p-4 rounded shadow-sm">
+      <h2 class="mb-0">👋 Welcome to the GenAI Assistant</h2>
+      <p class="text-muted">Manage content, interact with your assistant, and stay on top of deadlines.</p>
+    </div>
   </div>
 
-  <!-- Calendar -->
+  <!-- Calendar Section -->
   <div class="col-md-4">
-    <div id='calendar'></div>
+    <div class="card shadow-sm mb-4" style="max-height: 350px; overflow-y: auto;">
+      <div class="card-header text-white" style="background-color: rgb(77, 81, 139);">
+        🗓️ Upcoming Deadlines
+      </div>
+      <div class="card-body p-2">
+        <div id="calendar" style="max-width: 100%;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pending Work Items Monitoring -->
+  <div class="col-md-4">
+    <div class="card shadow-sm border-0" style="max-height: 350px; overflow-y: auto;">
+      <div class="card-header text-white" style="background-color: rgb(77, 81, 139);">
+        📝 Pending Work Items Monitoring
+      </div>
+      <div class="card-body">
+        <p class="text-muted">This section will track tasks or documents that require attention or are incomplete.</p>
+        <ul class="list-group">
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            Finalize uploaded meeting summary
+            <span class="badge bg-warning text-dark">Pending</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            Review document: Q2 Strategy Plan
+            <span class="badge bg-warning text-dark">Not Started</span>
+          </li>
+
+          
+          <!-- Add more items here if needed -->
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upcoming Workloads Prediction -->
+  <div class="col-md-4">
+    <div class="card shadow-sm border-0" style="max-height: 350px; overflow-y: auto;">
+      <div class="card-header text-white" style="background-color: rgb(77, 81, 139);">
+        🔮 Upcoming Workloads Prediction
+      </div>
+      <div class="card-body">
+        <p class="text-muted">This section will analyze your data to estimate upcoming workload and priorities.</p>
+        <ul class="list-group">
+          <li class="list-group-item">
+            📅 Report generation task expected next week.
+          </li>
+          <li class="list-group-item">
+            📌 Increased activity predicted around 10th June.
+          </li>
+          <!-- Add more items here if needed -->
+        </ul>
+      </div>
+    </div>
   </div>
 </div>
 
+
+
+
+
+
 <!-- Floating Chat Button -->
-<button id="chatbot-toggle" class="btn btn-primary rounded-circle"
-  style="position: fixed; bottom: 30px; right: 30px; z-index: 999">💬</button>
+<button id="chatbot-toggle" class="btn btn-primary rounded-circle shadow"
+  style="position: fixed; bottom: 30px; right: 30px; z-index: 999; background-color: rgb(77, 81, 139);" title="Open Chatbot">💬</button>
 
 <!-- Chatbot Popup -->
-<div id="chatbot-container" class="card"
-  style="display: none; position: fixed; bottom: 90px; right: 30px; width: 300px; z-index: 999;">
-  <div class="card-header bg-primary text-white">Chatbot Assistant</div>
-  <div class="card-body" id="chatbox" style="height: 200px; overflow-y: auto"></div>
+<div id="chatbot-container" class="card shadow"
+  style="display: none; position: fixed; bottom: 90px; right: 30px; width: 350px; z-index: 999;">
+  <div class="card-header text-white d-flex justify-content-between align-items-center" style="background-color: rgb(77, 81, 139);">
+    Chatbot Assistant
+    <button type="button" class="btn-close btn-close-white" aria-label="Close" onclick="chatbotContainer.style.display='none';"></button>
+  </div>
+  <div class="card-body" id="chatbox" style="height: 250px; overflow-y: auto; font-size: 0.9rem;"></div>
 
   <form id="chatbot-form" class="d-flex flex-column p-2 border-top" enctype="multipart/form-data">
     <div class="d-flex mb-2">
@@ -40,6 +97,7 @@
   </form>
 </div>
 {% endblock %}
+
 
 {% block extra_scripts %}
 <script>
@@ -92,7 +150,7 @@
       .then((res) => res.json())
       .then((data) => {
         const botReply = data.reply || "🤖 Sorry, I didn’t get that.";
-        chatbox.innerHTML += `<div class="text-start mb-2"><span class="badge bg-secondary">${botReply}</span></div>`;
+        chatbox.innerHTML += `<div class="text-start mb-2"><span class="badge bg-secondary" style="white-space: normal; word-wrap: break-word; display: inline-block; max-width: 100%; text-align: left;">${botReply}</span></div>`;
         chatbox.scrollTop = chatbox.scrollHeight;
         chatbotInput.value = "";
         fileInput.value = "";

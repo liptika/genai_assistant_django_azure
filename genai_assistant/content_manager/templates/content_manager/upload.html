@@ -1,21 +1,45 @@
 {% extends 'base.html' %}
 
+{% block title %}Upload Content - GenAI Assistant{% endblock %}
+
 {% block content %}
-<div class="d-flex justify-content-center align-items-center" style="min-height: 40vh;">
-  <div class="col-md-6">
-    <div class="card shadow">
-      <div class="card-header bg-primary text-white text-center">
-        <h4 class="mb-0">Upload Content</h4>
-      </div>
-      <div class="card-body text-center">
-        <form method="post" enctype="multipart/form-data">
-          {% csrf_token %}
-          <div class="mb-3 text-start">
-            {{ form.as_p }}
-          </div>
-          <button type="submit" class="btn btn-success">Upload</button>
-          <a href="{% url 'home' %}" class="btn btn-secondary ml-2">Back to Home</a>
-        </form>
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card shadow border-0">
+        <div class="card-header text-white text-center" style="background-color: rgb(77, 81, 139); min-height: 1.5rem;">
+          <h4 class="mb-0">📤 Upload New Content</h4>
+        </div>
+        <div class="card-body">
+          <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="mb-3">
+              {{ form.title.label_tag }}
+              {{ form.title }}
+            </div>
+            <div class="mb-3">
+              {{ form.content_type.label_tag }}
+              {{ form.content_type }}
+            </div>
+            <div class="mb-3">
+              {{ form.file.label_tag }}
+              {{ form.file }}
+            </div>
+            <div class="mb-3">
+              {{ form.link.label_tag }}
+              {{ form.link }}
+            </div>
+            <div class="mb-3">
+              {{ form.note.label_tag }}
+              {{ form.note }}
+            </div>
+
+            <div class="d-flex justify-content-between">
+              <a href="{% url 'home' %}" class="btn btn-outline-secondary">⬅ Back</a>
+              <button type="submit" class="btn btn-primary" style="background-color: rgb(77, 81, 139);">🚀 Upload</button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   </div>
