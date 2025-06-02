@@ -25,6 +25,12 @@ from .models import UploadedContent
 
 from .models import ChatMessage
 
+from .utils import extract_dates_and_references_from_file
+
+from azure.ai.formrecognizer import DocumentAnalysisClient
+from azure.core.credentials import AzureKeyCredential
+from dateutil import parser
+
 #API View
 
 class UploadedContentListCreateView(generics.ListCreateAPIView):
@@ -61,7 +67,7 @@ def chatbot_page(request):
     return render(request, 'content_manager/chatbot.html')
 
 # Calendar 
-def calendar_events(request):
+'''def calendar_events(request):
     events = [
         {
             "title": "Team Review",
@@ -72,7 +78,67 @@ def calendar_events(request):
             "start": str(datetime.date.today() + datetime.timedelta(days=3)),
         },
     ]
+    return JsonResponse(events, safe=False)'''
+
+def extract_dates_from_text(text):
+    events = []
+    lines = text.split('\n')
+    for line in lines:
+        try:
+            from dateutil.parser import parse
+            date = parse(line, fuzzy=True)
+            events.append({
+                "title": line.strip()[:50],
+                "start": date.date().isoformat()
+            })
+        except:
+            continue
+    return events
+
+def analyze_document(file_path):
+    endpoint = settings.AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT
+    key = settings.AZURE_DOCUMENT_INTELLIGENCE_KEY
+    client = DocumentAnalysisClient(endpoint=endpoint, credential=AzureKeyCredential(key))
+
+    with open(file_path, "rb") as f:
+        poller = client.begin_analyze_document("prebuilt-read", document=f)
+        result = poller.result()
+
+    content = ""
+    for page in result.pages:
+        for line in page.lines:
+            content += line.content + "\n"
+    return content
+
+def calendar_events(request):
+    events = []
+    uploaded = UploadedContent.objects.all()
+
+    for item in uploaded:
+        if item.file:
+            file_path = item.file.path
+            ext = os.path.splitext(file_path)[1].lower()
+
+            try:
+                if ext == ".txt":
+                    # Direct read for .txt
+                    with open(file_path, "r", encoding="utf-8") as f:
+                        text = f.read()
+                elif ext in [".pdf", ".jpg", ".jpeg", ".png", ".tiff", ".xlsx"]:
+                    text = analyze_document(file_path)
+                else:
+                    print(f"⚠️ Skipped unsupported file type: {file_path}")
+                    continue
+
+                extracted = extract_dates_from_text(text)
+                events.extend(extracted)
+
+            except Exception as e:
+                print(f"❌ Error processing {item.title}: {e}")
+                continue
+
     return JsonResponse(events, safe=False)
+
     
 
 def calendar_test_view(request):

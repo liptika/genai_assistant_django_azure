@@ -1,11 +1,11 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Calendar Test</title>
-  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
-</head>
-<body>
-  <h2 style="text-align:center;">Calendar Test Page</h2>
+{% extends 'base.html' %}
+
+{% block title %}Your Time Map{% endblock %}
+
+
+{% block content %}
+
+  <h2 style="text-align:center;">Your Time Map</h2>
   <div id='calendar' style="max-width: 900px; margin: 50px auto;"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
@@ -20,5 +20,6 @@
       calendar.render();
     });
   </script>
-</body>
-</html>
+
+
+{% endblock %}

@@ -1,1 +1,3 @@
-demo.txt
+Meeting with client on 2025-06-10
+Project deadline: June 15, 2025
+Final review: 20th June 2025
