@@ -7,6 +7,9 @@
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
   <!-- FullCalendar CSS -->
   <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
 
@@ -22,17 +25,20 @@
       font-size: 1rem;
     }
     .bg-blue {
-    --bs-bg-opacity: 1;
-    background-color: rgb(77, 81, 139);
-}
+      --bs-bg-opacity: 1;
+      background-color: rgb(77, 81, 139);
+    }
+    .nav-link i {
+      margin-right: 6px;
+    }
   </style>
 </head>
 
-<body >
+<body>
   <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-blue sticky-top" >
+  <nav class="navbar navbar-expand-lg navbar-dark bg-blue sticky-top">
     <div class="container-fluid">
-      <a class="navbar-brand" href="/">⚡ GenAI Assistant</a>
+      <a class="navbar-brand" href="/"><i class="bi bi-lightning-charge-fill"></i> AskEra</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -40,22 +46,25 @@
       <div class="collapse navbar-collapse justify-content-end" id="navbarContent">
         <ul class="navbar-nav mb-2 mb-lg-0">
           <li class="nav-item">
-            <a class="nav-link" href="/">🏠 Home</a>
+            <a class="nav-link" href="/"><i class="bi bi-house-door-fill"></i> Home</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/upload/">📤 Upload</a>
+            <a class="nav-link" href="/upload/"><i class="bi bi-upload"></i> Upload</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/content_list/">📚 Uploaded Contents</a>
+            <a class="nav-link" href="/explore/"><i class="bi bi-globe"></i> Explore</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/saved_chats/">💬 Saved Chats</a>
+            <a class="nav-link" href="/content_list/"><i class="bi bi-journal-bookmark-fill"></i> Uploaded Contents</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/calendar-test">🗓️ Time Map</a>
+            <a class="nav-link" href="/saved_chats/"><i class="bi bi-chat-dots-fill"></i> Saved Chats</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/api/uploads/">🔗 Uploads API</a>
+            <a class="nav-link" href="/calendar-test"><i class="bi bi-calendar-week-fill"></i> Time Map</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/api/uploads/"><i class="bi bi-link-45deg"></i> Uploads API</a>
           </li>
         </ul>
       </div>
@@ -70,6 +79,8 @@
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+
   {% block extra_scripts %}{% endblock %}
 </body>
 </html>

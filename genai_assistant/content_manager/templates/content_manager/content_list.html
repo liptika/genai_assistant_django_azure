@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="container mt-5">
-  <h1 class="mb-4">📄 Uploaded Content</h1>
+  <h2 class="mb-4">📄 Uploaded Contents</h2>
 
   {% if uploaded_contents %}
   <div class="table-responsive">
@@ -42,4 +42,5 @@
   </div>
   {% endif %}
 </div>
+{% include 'bot.html' %}
 {% endblock %}

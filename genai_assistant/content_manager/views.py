@@ -31,6 +31,9 @@ from azure.ai.formrecognizer import DocumentAnalysisClient
 from azure.core.credentials import AzureKeyCredential
 from dateutil import parser
 
+from docx import Document
+from pptx import Presentation
+
 #API View
 
 class UploadedContentListCreateView(generics.ListCreateAPIView):
@@ -40,7 +43,10 @@ class UploadedContentListCreateView(generics.ListCreateAPIView):
 #UI View
     
 def home(request):
-    return render(request, 'content_manager/home.html')
+    return render(request, 'content_manager/home.html', {
+        'weather_api_key': settings.WEATHER_API_KEY
+    })
+
 
 # Page to upload and manage content
 '''def upload_page(request):
@@ -81,19 +87,38 @@ def chatbot_page(request):
     return JsonResponse(events, safe=False)'''
 
 def extract_dates_from_text(text):
+    from dateutil.parser import parse
     events = []
     lines = text.split('\n')
+
     for line in lines:
         try:
-            from dateutil.parser import parse
             date = parse(line, fuzzy=True)
+
+            # Determine category based on keywords
+            line_lower = line.lower()
+            if any(keyword in line_lower for keyword in ["meeting", "review", "project", "deadline", "strategy"]):
+                category = "professional"
+                color = "#87CEFA"  # Light Blue
+            elif any(keyword in line_lower for keyword in ["birthday", "anniversary", "party", "doctor", "appointment", "family", "friend"]):
+                category = "personal"
+                color = "#FFB6C1"  # Light Pink
+            else:
+                category = "general"
+                color = "#D3D3D3"  # Light Gray for uncategorized
+
             events.append({
                 "title": line.strip()[:50],
-                "start": date.date().isoformat()
+                "start": date.date().isoformat(),
+                "category": category,
+                "color": color
             })
+
         except:
             continue
+
     return events
+
 
 def analyze_document(file_path):
     endpoint = settings.AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT
@@ -126,6 +151,17 @@ def calendar_events(request):
                         text = f.read()
                 elif ext in [".pdf", ".jpg", ".jpeg", ".png", ".tiff", ".xlsx"]:
                     text = analyze_document(file_path)
+                elif ext == ".docx":
+                    doc = Document(file_path)
+                    text = "\n".join([para.text for para in doc.paragraphs])
+                elif ext == ".pptx":
+                    prs = Presentation(file_path)
+                    text_runs = []
+                    for slide in prs.slides:
+                        for shape in slide.shapes:
+                            if hasattr(shape, "text"):
+                                text_runs.append(shape.text)
+                    text = "\n".join(text_runs)
                 else:
                     print(f"⚠️ Skipped unsupported file type: {file_path}")
                     continue
@@ -235,3 +271,9 @@ def chatbot_api(request):
 def saved_chats(request):
     chats = ChatMessage.objects.order_by('-timestamp')
     return render(request, 'content_manager/saved_chats.html', {'chats': chats})
+
+
+def index(request):
+    return render(request, 'home.html', {
+        'weather_api_key': settings.WeatherAPI
+    })
