@@ -11,4 +11,6 @@ urlpatterns = [
     path('chatbot_api/', views.chatbot_api, name='chatbot_api'),
     path('content/delete/<int:content_id>/', views.delete_content, name='delete_content'),
     path('saved_chats/', views.saved_chats, name='saved_chats'),
+    path('explore/', views.explore_page, name='explore_page'),
+    path('explore/query/', views.explore_api, name='explore_api'),
 ]

@@ -34,6 +34,10 @@ from dateutil import parser
 from docx import Document
 from pptx import Presentation
 
+from .models import SearchHistory
+from django.db.models import Count
+import requests
+
 #API View
 
 class UploadedContentListCreateView(generics.ListCreateAPIView):
@@ -273,7 +277,29 @@ def saved_chats(request):
     return render(request, 'content_manager/saved_chats.html', {'chats': chats})
 
 
-def index(request):
-    return render(request, 'home.html', {
-        'weather_api_key': settings.WeatherAPI
-    })
+
+
+
+
+@csrf_exempt
+def explore_api(request):
+    if request.method == "POST":
+        query = request.POST.get("query", "").strip()
+
+        if not query:
+            return JsonResponse({"error": "No input provided."}, status=400)
+
+        try:
+            
+            chain = get_langchain_chain()
+            response = chain.run(query)
+
+            return JsonResponse({"response": response})
+
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Only POST allowed."}, status=405)
+
+def explore_page(request):
+    return render(request, 'content_manager/explore.html')

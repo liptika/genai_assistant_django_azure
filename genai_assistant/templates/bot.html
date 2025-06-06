@@ -1,15 +1,30 @@
 <!-- Floating Chat Button -->
-<button id="chatbot-toggle" class="btn btn-primary rounded-circle shadow"
-  style="position: fixed; bottom: 30px; right: 30px; z-index: 999; background-color: rgb(77, 81, 139);" title="Open Chatbot">💬</button>
+<button id="chatbot-toggle" class="btn btn-primary rounded-circle shadow" style="
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 999;
+    background-color: rgb(77, 81, 139);
+  " title="Open Chatbot">
+  <i class="bi bi-chat-dots-fill"></i>
+</button>
 
 <!-- Chatbot Popup -->
-<div id="chatbot-container" class="card shadow"
-  style="display: none; position: fixed; bottom: 90px; right: 30px; width: 350px; z-index: 999;">
-  <div class="card-header text-white d-flex justify-content-between align-items-center" style="background-color: rgb(77, 81, 139);">
+<div id="chatbot-container" class="card shadow" style="
+    display: none;
+    position: fixed;
+    bottom: 90px;
+    right: 30px;
+    width: 350px;
+    z-index: 999;
+  ">
+  <div class="card-header text-white d-flex justify-content-between align-items-center"
+    style="background-color: rgb(77, 81, 139)">
     Chatbot Assistant
-    <button type="button" class="btn-close btn-close-white" aria-label="Close" onclick="chatbotContainer.style.display='none';"></button>
+    <button type="button" class="btn-close btn-close-white" aria-label="Close"
+      onclick="chatbotContainer.style.display='none';"></button>
   </div>
-  <div class="card-body" id="chatbox" style="height: 250px; overflow-y: auto; font-size: 0.9rem;"></div>
+  <div class="card-body" id="chatbox" style="height: 250px; overflow-y: auto; font-size: 0.9rem"></div>
 
   <form id="chatbot-form" class="d-flex flex-column p-2 border-top" enctype="multipart/form-data">
     <div class="d-flex mb-2">
@@ -21,7 +36,6 @@
     </div>
   </form>
 </div>
-
 <script>
   const chatbotToggle = document.getElementById("chatbot-toggle");
   const chatbotContainer = document.getElementById("chatbot-container");

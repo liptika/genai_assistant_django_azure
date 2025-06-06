@@ -28,4 +28,14 @@ class ChatMessage(models.Model):
 
     def __str__(self):
         return f"{self.timestamp} - User: {self.user_message}"
+    
+
+#Search History
+class SearchHistory(models.Model):
+    query = models.CharField(max_length=255)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.query
+
 
