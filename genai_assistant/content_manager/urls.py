@@ -13,4 +13,5 @@ urlpatterns = [
     path('saved_chats/', views.saved_chats, name='saved_chats'),
     path('explore/', views.explore_page, name='explore_page'),
     path('explore/query/', views.explore_api, name='explore_api'),
+    path('ai/insights/', views.ai_insights, name='ai_insights'),
 ]

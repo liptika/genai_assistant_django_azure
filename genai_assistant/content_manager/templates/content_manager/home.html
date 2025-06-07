@@ -8,7 +8,7 @@
         <div class="bg-white p-4 rounded shadow-sm row">
           <div class="col-md-8">
             <h2 class="mb-0"><i class="bi bi-robot"></i> Hi! I'm AskEra, Your Companion!</h2>
-            
+
             <p class="text-muted">
               Manage contents, interact with them, and stay on top of
               everything.
@@ -16,7 +16,7 @@
           </div>
           <div class="col-md-4">
             <div class="card shadow rounded-4">
-              
+
               <div class="card-body text-center">
                 <i class="bi bi-cloud-sun"></i> Weather Now
                 <h6 class="text-muted" id="weather-info">Loading weather...</h6>
@@ -30,24 +30,14 @@
     <div class="row mt-4">
       <!-- Pending Work Items Monitoring -->
       <div class="col-md-6">
-        <div class="card shadow-sm border-0" style="max-height: 357px; overflow-y: auto">
-          <div class="card-header text-white" style="background-color: rgb(77, 81, 139)">
-            <i class="bi bi-pencil-square"></i> Pending Work Items Monitoring
+        <div class="card shadow-sm border-0" style="max-height: 350px; overflow-y: auto;">
+          <div class="card-header text-white" style="background-color: rgb(77, 81, 139); position: sticky;  top: 0; z-index: 1;">
+            <i class="bi bi-journal-text"></i> Pending Work Items Monitoring
           </div>
           <div class="card-body">
-            <p class="text-muted">
-              This section will track tasks or documents that require attention
-              or are incomplete.
-            </p>
-            <ul class="list-group">
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                Finalize uploaded meeting summary
-                <span class="badge bg-warning text-dark">Pending</span>
-              </li>
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                Review document: Q2 Strategy Plan
-                <span class="badge bg-warning text-dark">Not Started</span>
-              </li>
+            <p class="text-muted">Tasks that require attention or are incomplete:</p>
+            <ul class="list-group" id="pending-tasks-list">
+              <li class="list-group-item text-muted">Loading...</li>
             </ul>
           </div>
         </div>
@@ -55,44 +45,30 @@
 
       <!-- Upcoming Workloads Prediction -->
       <div class="col-md-6">
-        <div class="card shadow-sm border-0" style="max-height: 357px; overflow-y: auto">
-          <div class="card-header text-white" style="background-color: rgb(77, 81, 139)">
-            <i class="bi bi-stars"></i> Upcoming Workloads Prediction
+        <div class="card shadow-sm border-0" style="max-height: 350px; overflow-y: auto;">
+          <div class="card-header text-white" style="background-color: rgb(77, 81, 139); position: sticky;  top: 0; z-index: 1;">
+            <i class="bi bi-cpu"></i> Upcoming Workloads Prediction
           </div>
           <div class="card-body">
-            <p class="text-muted">
-              This section will analyze your data to estimate upcoming workload
-              and priorities.
-            </p>
-            <ul class="list-group">
-              <li class="list-group-item">
-                <i class="bi bi-calendar-event"></i> Report generation task expected next week.
-              </li>
-              <li class="list-group-item">
-                <i class="bi bi-pin-angle-fill"></i> Increased activity predicted around 10th June.
-              </li>
-              <li class="list-group-item">
-                <i class="bi bi-pin-angle-fill"></i> Increased activity predicted around 10th June.
-              </li>
-              <li class="list-group-item">
-                <i class="bi bi-pin-angle-fill"></i> Increased activity predicted around 10th June.
-              </li>
-              <li class="list-group-item">
-                <i class="bi bi-pin-angle-fill"></i> Increased activity predicted around 10th June.
-              </li>
+            <p class="text-muted">AI-based prediction of upcoming workload and priorities:</p>
+            <ul class="list-group" id="upcoming-workloads-list">
+              <li class="list-group-item text-muted">Loading...</li>
             </ul>
           </div>
         </div>
       </div>
     </div>
+
+    
   </div>
 
   <!-- Calendar Section -->
   <div class="col-md-4">
     <div class="card shadow-sm mb-4" style="overflow-y: auto; min-height: 450px">
-      <div class="card-header text-white d-flex justify-content-between align-items-center" style="background-color: rgb(77, 81, 139)">
+      <div class="card-header text-white d-flex justify-content-between align-items-center"
+        style="background-color: rgb(77, 81, 139)">
         <span><i class="bi bi-calendar-week"></i> Time Map</span>
-        
+
         <!-- Clickable arrow with tooltip and pointer -->
         <a href="/calendar-test" title="Go to full calendar" style="color: white; text-decoration: none;">
           <i class="bi bi-arrow-right" style="cursor: pointer; transition: transform 0.2s;"></i>
@@ -103,8 +79,8 @@
       </div>
     </div>
   </div>
-  
-  
+
+
 </div>
 
 <!-- Floating Chat Button -->
@@ -148,11 +124,79 @@
 
 {% endblock %} {% block extra_scripts %}
 <script>
-  
+  // Fetch AI-generated insights for tasks and workloads
+  fetch('/ai/insights/')
+    .then(response => response.json())
+    .then(data => {
+      const pendingList = document.getElementById('pending-tasks-list');
+      const upcomingList = document.getElementById('upcoming-workloads-list');
 
+      // Populate Pending Work Items
+      pendingList.innerHTML = '';
+      // data.pending.forEach OR processing each item
+      data.pending.forEach(item => {
+        const subItems = item.split(/(?:^|\s)(?=\d\.\s)/); // split at '1. ', '2. ', etc.
+
+        subItems.forEach((sub, index) => {
+          if (index === 0) {
+            // The part before 1. (e.g., summary)
+            pendingList.innerHTML += `
+        <li class="list-group-item text-muted">
+          ${sub.trim()}
+        </li>`;
+          } else {
+            // Actual work items
+            pendingList.innerHTML += `
+        <li class="list-group-item d-flex justify-content-between align-items-start flex-column">
+          <div><i class="bi bi-pin"></i> ${sub.trim()}</div>
+          <span class="badge bg-warning text-dark mt-2 align-self-end">Pending</span>
+        </li>`;
+          }
+        });
+      });
+
+
+      // Populate Upcoming Workloads
+      upcomingList.innerHTML = '';
+      // data.upcoming.forEach OR processing each item
+      data.upcoming.forEach(item => {
+        const subItems = item.split(/(?:^|\s)(?=\d\.\s)/); // split at '1. ', '2. ', etc.
+
+        subItems.forEach((sub, index) => {
+          if (index === 0) {
+            // The part before 1. (e.g., summary)
+            upcomingList.innerHTML += `
+        <li class="list-group-item text-muted">
+          ${sub.trim()}
+        </li>`;
+          } else {
+            // Actual work items
+            upcomingList.innerHTML += `
+        <li class="list-group-item d-flex justify-content-between align-items-start flex-column">
+          <div><i class="bi bi-pin"></i> ${sub.trim()}</div>
+          <span class="badge text-dark mt-2 align-self-end" style="background-color:rgb(221 243 166);">Upcoming</span>
+        </li>`;
+          }
+        });
+      });
+    })
+    .catch(error => {
+      console.error('Error fetching AI insights:', error);
+      document.getElementById('pending-tasks-list').innerHTML =
+        '<li class="list-group-item text-danger">Error loading tasks</li>';
+      document.getElementById('upcoming-workloads-list').innerHTML =
+        '<li class="list-group-item text-danger">Error loading workloads</li>';
+    });
+
+
+
+
+
+
+  //Openweather response
   const apiKey = "{{weather_api_key}}";
   console.log("Weather API Key:", apiKey);
-  
+
   navigator.geolocation.getCurrentPosition(
     async function (position) {
       const lat = position.coords.latitude;
@@ -176,7 +220,7 @@
         "⚠️ Unable to get location";
     }
   );
-  
+
 
   // Toggle Chatbot
   const chatbotToggle = document.getElementById("chatbot-toggle");

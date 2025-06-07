@@ -34,9 +34,15 @@ from dateutil import parser
 from docx import Document
 from pptx import Presentation
 
-from .models import SearchHistory
+
 from django.db.models import Count
 import requests
+
+from .document_utils import extract_text_from_file
+from .langchain_utils import get_langchain_chain, embed_texts, split_text_to_chunks, generate_ai_summary
+from .azure_search_utils import index_document, delete_document
+
+import psutil
 
 #API View
 
@@ -61,7 +67,30 @@ def upload_content(request):
     if request.method == 'POST':
         form = UploadedContentForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
+            uploaded_instance = form.save()
+
+            if uploaded_instance.file:
+                file_path = uploaded_instance.file.path
+                print(f"Extracting text from file at: {file_path}")
+                extracted_text = extract_text_from_file(file_path)
+                print(f"Extracted text length: {len(extracted_text)}")
+                uploaded_instance.extracted_text = extracted_text
+                uploaded_instance.save()
+
+                # Split, embed, and index chunks
+                chunks = split_text_to_chunks(extracted_text)
+                print(f"Split into {len(chunks)} chunks")
+                vectors = embed_texts(chunks)
+                print(f"Generated {len(vectors)} vectors")
+
+                vector_ids = []
+                for chunk, vector in zip(chunks, vectors):
+                    doc_id = index_document(uploaded_instance.title, chunk, vector)
+                    vector_ids.append(doc_id)
+
+                uploaded_instance.vector_id = ",".join(vector_ids)
+                uploaded_instance.save()
+
             return redirect('content_list')
     else:
         form = UploadedContentForm()
@@ -101,7 +130,7 @@ def extract_dates_from_text(text):
 
             # Determine category based on keywords
             line_lower = line.lower()
-            if any(keyword in line_lower for keyword in ["meeting", "review", "project", "deadline", "strategy"]):
+            if any(keyword in line_lower for keyword in ["meeting", "review", "project", "deadline", "strategy","risk","test","develop"]):
                 category = "professional"
                 color = "#87CEFA"  # Light Blue
             elif any(keyword in line_lower for keyword in ["birthday", "anniversary", "party", "doctor", "appointment", "family", "friend"]):
@@ -190,52 +219,65 @@ from .langchain_utils import get_langchain_chain
 
 @csrf_exempt
 def chatbot_api(request):
-    if request.method == "POST":
-        message = request.POST.get("message", "").strip()
-        uploaded_file = request.FILES.get("file")
-        ai_reply = ""
+    if request.method != "POST":
+        return JsonResponse({"error": "Only POST requests are allowed."}, status=405)
 
-        # ⬇️ Handle file upload
-        if uploaded_file:
-            filename = f"{uuid.uuid4()}_{uploaded_file.name}"
-            file_path = os.path.join("uploads", filename)
-            save_path = os.path.join(settings.MEDIA_ROOT, file_path)
+    message = request.POST.get("message", "").strip()
+    uploaded_file = request.FILES.get("file")
+    ai_reply = ""
 
-            os.makedirs(os.path.dirname(save_path), exist_ok=True)
+    # Handle uploaded file in chatbot API
+    if uploaded_file:
+        filename = f"{uuid.uuid4()}_{uploaded_file.name}"
+        file_path = os.path.join("uploads", filename)
+        save_path = os.path.join(settings.MEDIA_ROOT, file_path)
+        os.makedirs(os.path.dirname(save_path), exist_ok=True)
 
-            with default_storage.open(save_path, 'wb+') as destination:
-                for chunk in uploaded_file.chunks():
-                    destination.write(chunk)
+        with default_storage.open(save_path, 'wb+') as destination:
+            for chunk in uploaded_file.chunks():
+                destination.write(chunk)
 
-            # Save to DB
-            UploadedContent.objects.create(
-                title=uploaded_file.name,
-                file=file_path,
-                content_type='doc'  # Static for now
-            )
+        print(f"Extracting text from uploaded file at: {save_path}")
+        extracted_text = extract_text_from_file(save_path)
 
-            ai_reply += f"✅ Uploaded file: {uploaded_file.name}. "
-
-        # ⬇️ Use LangChain to generate a real response
-        if message:
-            try:
-                chain = get_langchain_chain()
-                langchain_response = chain.run(message)
-                ai_reply += langchain_response
-            except Exception as e:
-                ai_reply += f"❌ Error generating response: {str(e)}"
-        elif not ai_reply:
-            ai_reply = "🤖 You didn't say anything!"
-
-        # ⬇️ Save to DB
-        ChatMessage.objects.create(
-            user_message=message or "",
-            bot_reply=ai_reply
+        uploaded_instance = UploadedContent.objects.create(
+            title=uploaded_file.name,
+            file=file_path,
+            content_type='doc',
+            extracted_text=extracted_text,
         )
 
-        return JsonResponse({"reply": ai_reply})
+        chunks = split_text_to_chunks(extracted_text)
+        vectors = embed_texts(chunks)
+        vector_ids = []
 
-    return JsonResponse({"error": "Only POST requests are allowed."}, status=405)
+        for chunk, vector in zip(chunks, vectors):
+            doc_id = index_document(uploaded_file.name, chunk, vector)
+            vector_ids.append(doc_id)
+
+        uploaded_instance.vector_id = ",".join(vector_ids)
+        uploaded_instance.save()
+
+        ai_reply += f"✅ Uploaded and processed file: {uploaded_file.name}. "
+
+    # Handle chat message
+    if message:
+        try:
+            rag_function = get_langchain_chain()  # returns a callable
+            langchain_response = rag_function(message)
+            ai_reply += langchain_response
+        except Exception as e:
+            ai_reply += f"❌ Error generating response: {str(e)}"
+    elif not ai_reply:
+        ai_reply = "🤖 You didn't say anything!"
+
+    # Save chat history
+    ChatMessage.objects.create(
+        user_message=message or "",
+        bot_reply=ai_reply
+    )
+
+    return JsonResponse({"reply": ai_reply})
 
 
 
@@ -244,16 +286,40 @@ def chatbot_api(request):
 #Delete Saved Files
 def delete_content(request, content_id):
     content = get_object_or_404(UploadedContent, id=content_id)
-    
-    if request.method == "POST":
-        # Delete file from filesystem
-        if content.file and os.path.isfile(content.file.path):
-            os.remove(content.file.path)
 
-        # Delete from database
+    if request.method == "POST":
+        file_path = content.file.path if content.file else None
+
+        # Delete file safely
+        if file_path and os.path.isfile(file_path):
+            try:
+                os.remove(file_path)
+            except PermissionError as e:
+                # Check which process is locking the file (Windows)
+                for proc in psutil.process_iter(["pid", "name", "open_files"]):
+                    try:
+                        for f in proc.info["open_files"] or []:
+                            if file_path == f.path:
+                                print(f"⚠️ File in use by PID {proc.info['pid']} - {proc.info['name']}")
+                    except Exception:
+                        pass
+                messages.error(request, f"File is currently in use and cannot be deleted: {e}")
+                return redirect('content_list')
+            except Exception as e:
+                messages.error(request, f"Unexpected error deleting file: {e}")
+                return redirect('content_list')
+
+        # Delete from Azure AI Search index
+        if content.vector_id:
+            try:
+                for doc_id in content.vector_id.split(","):
+                    delete_document(doc_id.strip())
+            except Exception as e:
+                messages.warning(request, "File deleted, but some vector data may not have been removed.")
+
         content.delete()
-        messages.success(request, "File deleted successfully.")
-    
+        messages.success(request, "File and associated data deleted successfully.")
+
     return redirect('content_list')
 
 '''
@@ -279,7 +345,8 @@ def saved_chats(request):
 
 
 
-
+# Explore Section
+from .langchain_utils import get_langchain_chain_updated  
 
 @csrf_exempt
 def explore_api(request):
@@ -291,7 +358,7 @@ def explore_api(request):
 
         try:
             
-            chain = get_langchain_chain()
+            chain = get_langchain_chain_updated()
             response = chain.run(query)
 
             return JsonResponse({"response": response})
@@ -300,6 +367,28 @@ def explore_api(request):
             return JsonResponse({"error": str(e)}, status=500)
 
     return JsonResponse({"error": "Only POST allowed."}, status=405)
-
+#explore.html
 def explore_page(request):
     return render(request, 'content_manager/explore.html')
+
+#Promt generation - RAG based
+def ai_insights(request):
+    """
+    Generate AI-based insights from Azure AI Search indexed data.
+    Includes: Pending Work Items and Upcoming Workloads.
+    """
+    try:
+        # Use LLM summaries directly based on embedded vector data
+        pending_prompt = "List 3 pending or incomplete work items from the documents."
+        upcoming_prompt = "Predict 3 upcoming workloads or expected tasks based on the documents."
+
+        pending_summary = generate_ai_summary(pending_prompt)
+        upcoming_summary = generate_ai_summary(upcoming_prompt)
+
+        return JsonResponse({
+            "pending": [pending_summary],
+            "upcoming": [upcoming_summary]
+        })
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
