@@ -50,8 +50,10 @@ AskEra is a personalized AI assistant powered by Azure and OpenAI, built with Dj
    python -m venv venv
    source venv/bin/activate     # On Windows: venv\Scripts\activate
 3. **Install dependencies**
+   ```bash
    pip install -r requirements.txt
 4. **Configure environment variables**
+    ```python
     AZURE_OPENAI_KEY = "your_openai_key"
     AZURE_OPENAI_ENDPOINT = "https://your-endpoint.openai.azure.com/"
     AZURE_OPENAI_DEPLOYMENT_NAME = "your_deployment_name"
@@ -64,17 +66,20 @@ AskEra is a personalized AI assistant powered by Azure and OpenAI, built with Dj
 
     OPENWEATHER_API_KEY = "your_openweather_api_key"
 5. **Apply database migrations**
+    ```python
     python manage.py makemigrations
     python manage.py migrate
 6. **Run the development server**
+    ```python
     python manage.py runserver
 7. **Access the application**
+    ```cpp
     http://127.0.0.1:8000/
 
 ---
 
 ## 📂 Project Structure
-
+```bash
 genai_assistant/
 │
 ├── content_manager/          # Main Django app
@@ -93,4 +98,17 @@ genai_assistant/
 ├── db.sqlite3                # SQLite database (using locally)
 ├── manage.py
 └── requirements.txt
+```
+
+---
+
+## ✅ Pages and Routes
+| Page             | URL                  | Description                                 |
+| :--------------- | :------------------- | :------------------------------------------ |
+| Home             | `/`                  | Central hub with upload, calendar, and chat |
+| Upload           | `/upload/`           | Upload content for analysis                 |
+| Explore          | `/explore/`          | Ask general queries (no file context)       |
+| Time Map         | `/calendar-test/`    | A detailed calendar view with categories    |
+| Uploaded Content | `/content_list/`     | List of uploaded files                      |
+| Saved Chats      | `/saved-chats/`      | View previous conversations                 |
 
