@@ -126,8 +126,9 @@ genai_assistant/
 ## 📄 License
 
 This project is licensed under the [MIT License](/LICENSE).
-```
+
 ---
+
 ## Contact
 
 **Liptika Dhal**  
