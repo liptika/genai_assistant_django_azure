@@ -125,12 +125,12 @@ genai_assistant/
 
 ## 📄 License
 ```markdown
-This project is licensed under the [MIT License](/LICENSE).
+- This project is licensed under the [MIT License](/LICENSE).
 
 ---
 ## Contact
 ```markdown
-**Liptika Dhal**  
+- **Liptika Dhal**  
 [GitHub](https://github.com/liptika) • [LinkedIn](https://linkedin.com/in/liptikadhal)
 
 ## 🚀 Future Scope
