@@ -115,6 +115,8 @@ genai_assistant/
 | Uploaded Content | `/content_list/`     | List of uploaded files                      |
 | Saved Chats      | `/saved-chats/`      | View previous conversations                 |
 
+---
+
 📸 Screenshots
 ![AskEra Home](/images/Home.PNG "Welcome to AskEra")
 
