@@ -117,7 +117,7 @@ genai_assistant/
 
 ---
 
-## 📸 Screenshots
+## 📸 Screenshot
 ---
 ![AskEra Home](/images/Home.PNG "Welcome to AskEra")
 
@@ -126,13 +126,14 @@ genai_assistant/
 ## 📄 License
 ```markdown
 - This project is licensed under the [MIT License](/LICENSE).
-
+```
 ---
 ## Contact
 ```markdown
 - **Liptika Dhal**  
 [GitHub](https://github.com/liptika) • [LinkedIn](https://linkedin.com/in/liptikadhal)
-
+```
+---
 ## 🚀 Future Scope
 
 AskEra is designed with extensibility in mind. Here are some planned or possible future enhancements:
