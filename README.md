@@ -117,8 +117,48 @@ genai_assistant/
 
 ---
 
-📸 Screenshots
+## 📸 Screenshots
 ---
 ![AskEra Home](/images/Home.PNG "Welcome to AskEra")
+
+---
+
+## 📄 License
+```markdown
+This project is licensed under the [MIT License](/LICENSE).
+
+---
+## Contact
+```markdown
+**Liptika Dhal**  
+[GitHub](https://github.com/liptika) • [LinkedIn](https://linkedin.com/in/liptikadhal)
+
+## 🚀 Future Scope
+
+AskEra is designed with extensibility in mind. Here are some planned or possible future enhancements:
+
+- **🔎 Grounded AI Agents with Bing Search**: Integrate Azure AI Agents and Grounding with Bing Search to provide more factual, real-time, and context-aware responses for complex queries.
+
+- **📌 Persistent User Profiles**: Implement user login and personalized dashboards to allow saved preferences, tracked learning history, and content tagging.
+
+- **🗣️ Voice Input & Output**: Enable voice-based interactions with speech-to-text and text-to-speech capabilities, making AskEra more accessible and interactive.
+
+- **🌐 Multi-language Support**: Expand support to regional and global languages to serve a more diverse audience.
+
+- **📥 Enhanced File Handling**: Add support for ZIP and Markdown formats with richer content parsing and summarization features.
+
+- **📡 Real-time Collaboration**: Enable multiple users to annotate and discuss uploaded documents simultaneously, useful for knowledge gathering or research.
+
+- **🔐 OAuth2 Integration**: Add secure login via Google, Microsoft, or GitHub for user-specific content tracking.
+
+---
+
+These additions aim to make AskEra not just an assistant, but a dynamic, intelligent learning companion.
+
+
+
+
+
+
 
 
