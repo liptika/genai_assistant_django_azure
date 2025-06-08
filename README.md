@@ -116,6 +116,6 @@ genai_assistant/
 | Saved Chats      | `/saved-chats/`      | View previous conversations                 |
 
 📸 Screenshots
-![AskEra Home](images/Home.PNG "Welcome to AskEra")
+![AskEra Home](/images/Home.PNG "Welcome to AskEra")
 
 
