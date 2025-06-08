@@ -44,7 +44,7 @@ AskEra is a personalized AI assistant powered by Azure and OpenAI, built with Dj
 1. **Clone the repository**
    ```bash
    git clone https://github.com/liptika/genai_assistant_django_azure.git
-   cd genai_assistant
+   cd genai_assistant_django_azure
 2. **Create and activate a virtual environment**
    ```bash
    python -m venv venv
@@ -52,7 +52,10 @@ AskEra is a personalized AI assistant powered by Azure and OpenAI, built with Dj
 3. **Install dependencies**
    ```bash
    pip install -r requirements.txt
-4. **Configure environment variables**
+4. **Go inside Django Project to run and set environments variables**
+   ```bash
+   cd genai_assistant
+5. **Configure environment variables**
     ```python
     AZURE_OPENAI_KEY = "your_openai_key"
     AZURE_OPENAI_ENDPOINT = "https://your-endpoint.openai.azure.com/"
@@ -65,14 +68,14 @@ AskEra is a personalized AI assistant powered by Azure and OpenAI, built with Dj
     AZURE_AI_SEARCH_ENDPOINT = "https://your-aisearch-endpoint/"
 
     OPENWEATHER_API_KEY = "your_openweather_api_key"
-5. **Apply database migrations**
+6. **Apply database migrations**
     ```python
     python manage.py makemigrations
     python manage.py migrate
-6. **Run the development server**
+7. **Run the development server**
     ```python
     python manage.py runserver
-7. **Access the application**
+8. **Access the application**
     ```cpp
     http://127.0.0.1:8000/
 
@@ -112,3 +115,5 @@ genai_assistant/
 | Uploaded Content | `/content_list/`     | List of uploaded files                      |
 | Saved Chats      | `/saved-chats/`      | View previous conversations                 |
 
+📸 Screenshots
+![AskEra Home](images/Home.PNG "Welcome to AskEra")
