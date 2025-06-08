@@ -119,6 +119,18 @@ def chatbot_page(request):
     ]
     return JsonResponse(events, safe=False)'''
 
+import re
+def remove_dates(text):
+    date_patterns = [
+        r'\b\d{1,2}[-/]\d{1,2}[-/]\d{2,4}\b',      # 12/05/2024 or 12-05-2024
+        r'\b\d{4}[-/]\d{1,2}[-/]\d{1,2}\b',        # 2024/05/12
+        r'\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{1,2},?\s+\d{4}\b', # Jan 1, 2024
+        r'\b\d{1,2}\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{4}\b'    # 1 Jan 2024
+    ]
+    for pattern in date_patterns:
+        text = re.sub(pattern, '', text, flags=re.IGNORECASE)
+    return text.strip()
+
 def extract_dates_from_text(text):
     from dateutil.parser import parse
     events = []
@@ -141,7 +153,7 @@ def extract_dates_from_text(text):
                 color = "#D3D3D3"  # Light Gray for uncategorized
 
             events.append({
-                "title": line.strip()[:50],
+                "title": remove_dates(line)[:50],
                 "start": date.date().isoformat(),
                 "category": category,
                 "color": color
@@ -216,6 +228,7 @@ def calendar_test_view(request):
 
 # Chatbot API
 from .langchain_utils import get_langchain_chain  
+from .urls_utils import extract_text_from_url, save_text_as_file
 
 @csrf_exempt
 def chatbot_api(request):
@@ -226,8 +239,59 @@ def chatbot_api(request):
     uploaded_file = request.FILES.get("file")
     ai_reply = ""
 
-    # Handle uploaded file in chatbot API
-    if uploaded_file:
+    # Check if message contains a URL
+    url_pattern = r'(https?://[^\s]+)'
+    urls = re.findall(url_pattern, message)
+
+    if urls:
+        url = urls[0]
+        print(f"Detected URL: {url}")
+        extracted_text = extract_text_from_url(url)
+        print(f"Extracted text length: {len(extracted_text)}")
+
+        if extracted_text.startswith("Error extracting text:"):
+            ai_reply += extracted_text + "\n"
+        else:
+            filename = save_text_as_file(extracted_text, prefix="scraped_")
+            print(f"Saved file: {filename}")
+
+            # Save DB entry
+            uploaded_instance = UploadedContent.objects.create(
+                title=f"Scraped content from {url}",
+                file=filename,
+                content_type='url',
+                extracted_text=extracted_text,
+            )
+
+            # Chunk, embed, index
+            try:
+                chunks = split_text_to_chunks(extracted_text)
+                print(f"Chunks generated: {len(chunks)}")
+
+                vectors = embed_texts(chunks)
+                print(f"Vectors generated: {len(vectors)}")
+            except Exception as e:
+                print(f"Error during chunking/embedding: {e}")
+                ai_reply += f"❌ Error during processing: {str(e)}"
+                chunks = []
+                vectors = []
+
+            vector_ids = []
+            for chunk, vector in zip(chunks, vectors):
+                try:
+                    doc_id = index_document(filename, chunk, vector)
+                    vector_ids.append(doc_id)
+                    print(f"Indexed chunk doc_id: {doc_id}")
+                except Exception as e:
+                    print(f"Error indexing document chunk: {e}")
+
+            uploaded_instance.vector_id = ",".join(vector_ids)
+            uploaded_instance.save()
+
+            ai_reply += f"✅ Fetched and processed content from URL: {url}\n"
+
+    # Handle uploaded file (normal upload)
+    elif uploaded_file:
         filename = f"{uuid.uuid4()}_{uploaded_file.name}"
         file_path = os.path.join("uploads", filename)
         save_path = os.path.join(settings.MEDIA_ROOT, file_path)
@@ -247,21 +311,35 @@ def chatbot_api(request):
             extracted_text=extracted_text,
         )
 
-        chunks = split_text_to_chunks(extracted_text)
-        vectors = embed_texts(chunks)
+        try:
+            chunks = split_text_to_chunks(extracted_text)
+            print(f"Chunks generated: {len(chunks)}")
+
+            vectors = embed_texts(chunks)
+            print(f"Vectors generated: {len(vectors)}")
+        except Exception as e:
+            print(f"Error during chunking/embedding: {e}")
+            ai_reply += f"❌ Error during processing: {str(e)}"
+            chunks = []
+            vectors = []
+
         vector_ids = []
 
         for chunk, vector in zip(chunks, vectors):
-            doc_id = index_document(uploaded_file.name, chunk, vector)
-            vector_ids.append(doc_id)
+            try:
+                doc_id = index_document(uploaded_file.name, chunk, vector)
+                vector_ids.append(doc_id)
+                print(f"Indexed chunk doc_id: {doc_id}")
+            except Exception as e:
+                print(f"Error indexing document chunk: {e}")
 
         uploaded_instance.vector_id = ",".join(vector_ids)
         uploaded_instance.save()
 
         ai_reply += f"✅ Uploaded and processed file: {uploaded_file.name}. "
 
-    # Handle chat message
-    if message:
+    # Handle chat message (non-URL, non-file)
+    if message and not urls:
         try:
             rag_function = get_langchain_chain()  # returns a callable
             langchain_response = rag_function(message)
@@ -379,7 +457,7 @@ def ai_insights(request):
     """
     try:
         # Use LLM summaries directly based on embedded vector data
-        pending_prompt = "List 3 pending or incomplete work items from the documents."
+        pending_prompt = "List 3 pending or incomplete work items from the documents with priority category. Each item of the list should have title, description, date and priority."
         upcoming_prompt = "Predict 3 upcoming workloads or expected tasks based on the documents."
 
         pending_summary = generate_ai_summary(pending_prompt)

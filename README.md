@@ -8,12 +8,13 @@ AskEra is a personalized AI assistant powered by Azure and OpenAI, built with Dj
 ## 🚀 Features
 
 - 🧠 **Chatbot Integration** – Chat with your documents using Azure OpenAI & Langchain.
-- 📁 **File Upload** – Supports `.pdf`, `.txt`, `.xlsx`, `.ppt`, `.jpg`, `.doc`.
+- 📁 **File Upload** – Supports `.pdf`, `.txt`, `.xlsx`, `csv`, `.ppt`, `.jpg`, `jpeg`, `png`, `tiff`, `docx`.
+- 🔄 **Support External Links**: Support for linking external content (like blog links, documentation URLs)
 - 🗂️ **Manage Uploaded Content** – View and delete uploaded files based on file name and upload time.
 - ⛅ **Weather API Integration** – Get real-time weather updates based on your current location.
 - 🗂️ **Content Understanding** – Analyze documents using Azure Document Intelligence.
 - 📅 **Calendar Extraction** – Automatically pull dates & events into a visual calendar with personal sphere and professional sphere seperated.
-- 🧾 **Flashcard Generation** – Learn quickly with AI-generated flashcards to monitor pending work items and to predict upcoming workloads.
+- 🧾 **Flashcard Generation** – Learn quickly with AI-generated flashcards to monitor pending work items based on demands and to predict upcoming workloads.
 - 🔍 **Explore Page** – Ask open-ended questions using only OpenAI (no document context).
 
 
@@ -39,6 +40,10 @@ AskEra is a personalized AI assistant powered by Azure and OpenAI, built with Dj
 
 ---
 
+## Solution Architecture
+
+![Solution Architecture](/images/Solution.PNG "Solution Architecture")
+---
 ## 📦 Installation
 
 1. **Clone the repository**
@@ -139,6 +144,7 @@ This project is licensed under the [MIT License](/LICENSE).
 
 AskEra is designed with extensibility in mind. Here are some planned or possible future enhancements:
 
+
 - **🔎 Grounded AI Agents with Bing Search**: Integrate Azure AI Agents and Grounding with Bing Search to provide more factual, real-time, and context-aware responses for complex queries.
 
 - **📌 Persistent User Profiles**: Implement user login and personalized dashboards to allow saved preferences, tracked learning history, and content tagging.
@@ -156,11 +162,4 @@ AskEra is designed with extensibility in mind. Here are some planned or possible
 ---
 
 These additions aim to make AskEra not just an assistant, but a dynamic, intelligent learning companion.
-
-
-
-
-
-
-
 

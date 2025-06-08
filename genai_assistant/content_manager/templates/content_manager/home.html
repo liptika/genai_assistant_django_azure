@@ -31,7 +31,8 @@
       <!-- Pending Work Items Monitoring -->
       <div class="col-md-6">
         <div class="card shadow-sm border-0" style="max-height: 350px; overflow-y: auto;">
-          <div class="card-header text-white" style="background-color: rgb(77, 81, 139); position: sticky;  top: 0; z-index: 1;">
+          <div class="card-header text-white"
+            style="background-color: rgb(77, 81, 139); position: sticky;  top: 0; z-index: 1;">
             <i class="bi bi-journal-text"></i> Pending Work Items Monitoring
           </div>
           <div class="card-body">
@@ -46,7 +47,8 @@
       <!-- Upcoming Workloads Prediction -->
       <div class="col-md-6">
         <div class="card shadow-sm border-0" style="max-height: 350px; overflow-y: auto;">
-          <div class="card-header text-white" style="background-color: rgb(77, 81, 139); position: sticky;  top: 0; z-index: 1;">
+          <div class="card-header text-white"
+            style="background-color: rgb(77, 81, 139); position: sticky;  top: 0; z-index: 1;">
             <i class="bi bi-cpu"></i> Upcoming Workloads Prediction
           </div>
           <div class="card-body">
@@ -59,7 +61,7 @@
       </div>
     </div>
 
-    
+
   </div>
 
   <!-- Calendar Section -->
@@ -135,25 +137,41 @@
       pendingList.innerHTML = '';
       // data.pending.forEach OR processing each item
       data.pending.forEach(item => {
-        const subItems = item.split(/(?:^|\s)(?=\d\.\s)/); // split at '1. ', '2. ', etc.
+        // Split the item at '1. ', '2. ', etc.
+        const subItems = item.split(/(?=\d+\.\s)/);
 
         subItems.forEach((sub, index) => {
           if (index === 0) {
-            // The part before 1. (e.g., summary)
+            // Summary section before '1. '
             pendingList.innerHTML += `
         <li class="list-group-item text-muted">
           ${sub.trim()}
         </li>`;
           } else {
-            // Actual work items
+            // Extract details using regex
+            const titleMatch = sub.match(/\*\*Title:\*\*\s*(.*?)\s*(?=\*\*|$)/);
+            const descMatch = sub.match(/\*\*Description:\*\*\s*(.*?)\s*(?=\*\*|$)/);
+            const dateMatch = sub.match(/\*\*Date:\*\*\s*(.*?)\s*(?=\*\*|$)/);
+            const priorityMatch = sub.match(/\*\*Priority:\*\*\s*(.*?)\s*(?=\*\*|$)/);
+
+            // Default values if fields not found
+            const title = titleMatch ? titleMatch[1] : "Untitled";
+            const description = descMatch ? descMatch[1] : "No description provided.";
+            const date = dateMatch ? dateMatch[1] : "No date specified.";
+            const priority = priorityMatch ? priorityMatch[1] : "Normal";
+
             pendingList.innerHTML += `
         <li class="list-group-item d-flex justify-content-between align-items-start flex-column">
-          <div><i class="bi bi-pin"></i> ${sub.trim()}</div>
+          <div><i class="bi bi-pin"></i> <strong>${title}</strong></div>
+          <div class="mt-1 text-muted"><i class="bi bi-card-text"></i> ${description}</div>
+          <div class="mt-1"><i class="bi bi-calendar-event"></i> ${date}</div>
+          <div class="mt-1"><i class="bi bi-exclamation-triangle-fill text-danger"></i> <strong>${priority}</strong></div>
           <span class="badge bg-warning text-dark mt-2 align-self-end">Pending</span>
         </li>`;
           }
         });
       });
+
 
 
       // Populate Upcoming Workloads
