@@ -118,7 +118,7 @@ genai_assistant/
 ---
 
 📸 Screenshots
-```
+---
 ![AskEra Home](/images/Home.PNG "Welcome to AskEra")
 
 
